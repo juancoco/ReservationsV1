@@ -2,6 +2,7 @@ package com.reservations.entity;
 
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import lombok.Getter;
@@ -14,9 +15,11 @@ import lombok.Setter;
 @Entity
 public class Rtable {
    
-   
    @Id
-   private Integer tableNumber;
+   @GeneratedValue
+   private Integer id;
+   
+   private String tableNumber;
    
    private Integer numberOfSeats;
 }

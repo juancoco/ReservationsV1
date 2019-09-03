@@ -13,6 +13,9 @@ import com.reservations.entity.Rtable;
 public interface RtableRepository extends JpaRepository<Rtable, Integer> {
    
    @Query("SELECT t FROM Rtable t WHERE t.tableNumber = :tableNumber")
-   Optional<Rtable> verifyTableExists(@Param("tableNumber") final Integer tableNumber);
+   Optional<Rtable> verifyTableExists(@Param("tableNumber") final String tableNumber);
+   
+   @Query("DELETE Rtable t WHERE t.tableNumber = :tableNumber")
+   Optional<Rtable> deleteByTableNumber(@Param("tableNumber") final String tableNumber);
 
 }

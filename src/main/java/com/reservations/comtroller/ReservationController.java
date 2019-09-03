@@ -1,5 +1,6 @@
 package com.reservations.comtroller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,29 +30,27 @@ public class ReservationController {
    }
 
    @PostMapping("/reservations")
-   private ResponseEntity<Object> saveReservation(@RequestBody Reservation reservation) {
-      if (isTableUnavailable(reservation))
-         throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
+   private ResponseEntity<Object> saveReservationMultipleTables(@RequestBody Reservation reservation) {
+      //Multiple table reservation
+      if(reservation.getTableNumber().contains(",")) {
+         String[] tablesToReserve = reservation.getTableNumber().split(",");
+         for (String tableToReserve : tablesToReserve) {
+            if (isTableUnavailable(tableToReserve, reservation.getReservationDateFrom(), reservation.getReservationDateTo()))
+               throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
+         }
+      }else {//Single table reservation
+         if (isTableUnavailable(reservation.getTableNumber(), reservation.getReservationDateFrom(), reservation.getReservationDateTo()))
+            throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
+      }
 
       reservationRepository.save(reservation);
       return ResponseEntity.ok().build();
    }
 
-   @PostMapping("/reservations/multiple")
-   private ResponseEntity<Object> saveReservationMultipleTables(@RequestBody List<Reservation> reservations) {
-      for (Reservation reservation : reservations) {
-         if (isTableUnavailable(reservation))
-            throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
-      }
-
-      reservationRepository.saveAll(reservations);
-      return ResponseEntity.ok().build();
-   }
-
-   private boolean isTableUnavailable(Reservation reservation) {
-      if (!tableRepository.verifyTableExists(reservation.getTableNumber()).isPresent()
-            || reservationRepository.searchReservedTableInPeriodTime(reservation.getTableNumber(),
-                  reservation.getReservationDateFrom(), reservation.getReservationDateTo()).isPresent()) {
+   private boolean isTableUnavailable(String tableNumber, Date reservationDateFrom, Date reservationDateTo) {
+      if (!tableRepository.verifyTableExists(tableNumber).isPresent()
+            || reservationRepository.searchReservedTableInPeriodTime(tableNumber,
+                  reservationDateFrom, reservationDateTo).isPresent()) {
          return true;
       } else {
          return false;

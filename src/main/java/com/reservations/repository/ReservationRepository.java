@@ -19,7 +19,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
    @Query("SELECT r FROM Reservation r WHERE r.tableNumber = :tableNumber "
          + "AND (r.reservationDateFrom BETWEEN :reservationDateFrom AND :reservationDateTo "
          + "OR r.reservationDateTo BETWEEN :reservationDateFrom AND :reservationDateTo)")
-   Optional<Reservation> searchReservedTableInPeriodTime(@Param("tableNumber") final Integer tableNumber, 
+   Optional<Reservation> searchReservedTableInPeriodTime(@Param("tableNumber") final String string, 
          @Param("reservationDateFrom") final Date reservationDateFrom, 
          @Param("reservationDateTo") final Date reservationDateTo);
 

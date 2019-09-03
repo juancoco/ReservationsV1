@@ -22,7 +22,7 @@ public class Reservation {
    @GeneratedValue
    private Integer id;
    
-   private Integer tableNumber;
+   private String tableNumber;
    
    private Integer idClient;
    

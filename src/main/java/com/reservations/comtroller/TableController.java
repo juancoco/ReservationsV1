@@ -30,16 +30,21 @@ public class TableController {
    @PostMapping(path="/tables")
    private ResponseEntity<Object> saveTable(@RequestBody Rtable table) {
       
-      if(tableRepository.findById(table.getTableNumber()).isPresent())
+      if(tableRepository.verifyTableExists(table.getTableNumber()).isPresent())
          throw new TableAlreadyCreatedException("Table number already created: "+ table.getTableNumber());
       
       tableRepository.save(table);
       return ResponseEntity.ok().build();
    }
    
+   /*@DeleteMapping(path="/tables/{id}")
+   private void deleteTableById(@PathVariable Integer id) {
+      tableRepository.deleteById(id);
+   }*/
+   
    @DeleteMapping(path="/tables/{tableNumber}")
-   private void deleteTableById(@PathVariable Integer tableNumber) {
-      tableRepository.deleteById(tableNumber);
+   private void deleteTableByTableNumber(@PathVariable String tableNumber) {
+      tableRepository.deleteByTableNumber(tableNumber);
    }
    
    @PutMapping(path="/tables/{id}")
