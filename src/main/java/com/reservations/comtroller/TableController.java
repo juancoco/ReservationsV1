@@ -16,8 +16,13 @@ import com.reservations.entity.Rtable;
 import com.reservations.exception.TableAlreadyCreatedException;
 import com.reservations.repository.RtableRepository;
 
+import lombok.extern.log4j.Log4j;
+
+@Log4j
 @RestController
 public class TableController {
+   
+   private static final String TABLE_CREATED = "Table created: ";
    
    @Autowired
    private RtableRepository tableRepository;
@@ -34,13 +39,9 @@ public class TableController {
          throw new TableAlreadyCreatedException("Table number already created: "+ table.getTableNumber());
       
       tableRepository.save(table);
+      log.info(TABLE_CREATED + table.getTableNumber());
       return ResponseEntity.ok().build();
    }
-   
-   /*@DeleteMapping(path="/tables/{id}")
-   private void deleteTableById(@PathVariable Integer id) {
-      tableRepository.deleteById(id);
-   }*/
    
    @DeleteMapping(path="/tables/{tableNumber}")
    private void deleteTableByTableNumber(@PathVariable String tableNumber) {

@@ -15,8 +15,14 @@ import com.reservations.exception.TableUnavailableException;
 import com.reservations.repository.ReservationRepository;
 import com.reservations.repository.RtableRepository;
 
+import lombok.extern.log4j.Log4j;
+
+@Log4j
 @RestController
 public class ReservationController {
+   
+   private static final String TABLE_UNAVAILABLE = "Table do not exist or is already reserved - ";
+   private static final String TABLE_NUMBER = "Table number: ";
 
    @Autowired
    private ReservationRepository reservationRepository;
@@ -35,12 +41,16 @@ public class ReservationController {
       if(reservation.getTableNumber().contains(",")) {
          String[] tablesToReserve = reservation.getTableNumber().split(",");
          for (String tableToReserve : tablesToReserve) {
-            if (isTableUnavailable(tableToReserve, reservation.getReservationDateFrom(), reservation.getReservationDateTo()))
-               throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
+            if (isTableUnavailable(tableToReserve, reservation.getReservationDateFrom(), reservation.getReservationDateTo())) {
+               log.error(TABLE_UNAVAILABLE + reservation.getTableNumber());
+               throw new TableUnavailableException(TABLE_NUMBER + reservation.getTableNumber());
+            }
          }
       }else {//Single table reservation
-         if (isTableUnavailable(reservation.getTableNumber(), reservation.getReservationDateFrom(), reservation.getReservationDateTo()))
-            throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
+         if (isTableUnavailable(reservation.getTableNumber(), reservation.getReservationDateFrom(), reservation.getReservationDateTo())) {
+            log.error(TABLE_UNAVAILABLE + reservation.getTableNumber());
+            throw new TableUnavailableException(TABLE_NUMBER + reservation.getTableNumber());
+         }
       }
 
       reservationRepository.save(reservation);
