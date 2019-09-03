@@ -49,7 +49,7 @@ public class ReservationController {
    }
 
    private boolean isTableUnavailable(Reservation reservation) {
-      if (!tableRepository.findById(reservation.getTableNumber()).isPresent()
+      if (!tableRepository.verifyTableExists(reservation.getTableNumber()).isPresent()
             || reservationRepository.searchReservedTableInPeriodTime(reservation.getTableNumber(),
                   reservation.getReservationDateFrom(), reservation.getReservationDateTo()).isPresent()) {
          return true;
