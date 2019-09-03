@@ -19,7 +19,7 @@ public class ReservationController {
 
    @Autowired
    private ReservationRepository reservationRepository;
-   
+
    @Autowired
    private RtableRepository tableRepository;
 
@@ -30,10 +30,8 @@ public class ReservationController {
 
    @PostMapping("/reservations")
    private ResponseEntity<Object> saveReservation(@RequestBody Reservation reservation) {
-      
-      if (!tableRepository.findById(reservation.getTableNumber()).isPresent() || reservationRepository.searchReservedTableInPeriodTime(reservation.getTableNumber(),
-            reservation.getReservationDateFrom(), reservation.getReservationDateTo()).isPresent())
-         throw new TableUnavailableException("Table number: "+ reservation.getTableNumber());
+      if (isTableUnavailable(reservation))
+         throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
 
       reservationRepository.save(reservation);
       return ResponseEntity.ok().build();
@@ -42,13 +40,22 @@ public class ReservationController {
    @PostMapping("/reservations/multiple")
    private ResponseEntity<Object> saveReservationMultipleTables(@RequestBody List<Reservation> reservations) {
       for (Reservation reservation : reservations) {
-         if (!tableRepository.findById(reservation.getTableNumber()).isPresent() || reservationRepository.searchReservedTableInPeriodTime(reservation.getTableNumber(),
-               reservation.getReservationDateFrom(), reservation.getReservationDateTo()).isPresent())
-            throw new TableUnavailableException("Table number: "+ reservation.getTableNumber());
+         if (isTableUnavailable(reservation))
+            throw new TableUnavailableException("Table number: " + reservation.getTableNumber());
       }
 
       reservationRepository.saveAll(reservations);
       return ResponseEntity.ok().build();
+   }
+
+   private boolean isTableUnavailable(Reservation reservation) {
+      if (!tableRepository.findById(reservation.getTableNumber()).isPresent()
+            || reservationRepository.searchReservedTableInPeriodTime(reservation.getTableNumber(),
+                  reservation.getReservationDateFrom(), reservation.getReservationDateTo()).isPresent()) {
+         return true;
+      } else {
+         return false;
+      }
    }
 
 }
